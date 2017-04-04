@@ -5,7 +5,7 @@ Facilitates comunication using the RFM95 series of chips.
 #include <fcntl.h>
 #include <string>
 #include <iostream>
-#include "Radio.hpp"
+#include "rfm9x.hpp"
 #include "spidev.h"
 #include <sys/ioctl.h>
 using namespace std;
@@ -163,12 +163,12 @@ void Radio::init() {
 }
 
 void Radio::startReceiving() {
-  // Continous receive mode
-  setReg(0x01, 0x85);
   // clear all interrupts
   setReg(0x12, 0xFF);
   // mask all the others
   setReg(0x11, ~0x60);
+  // Continous receive mode
+  setReg(0x01, 0x85);
 }
 
 void Radio::stopReceiving() {
@@ -192,6 +192,8 @@ void Radio::transmit(const void *data) {
   setReg(0x12, 0xFF);
   // mask all the others
   setReg(0x11, ~0x80);
+  // Start transmitting
+  setReg(0x01, 0x83);
   // Wait for receipt of packet
   //TODO use GPIO interrupt
   while ((getReg(0x12) & 0x80)!=0x80) {
