@@ -1,7 +1,10 @@
-#include <linux/i2c-dev.h>
 #include <stdint.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "i2c-dev.h"
 
 
 int file;
@@ -13,12 +16,14 @@ uint8_t magAddr = 0x1E;
 uint8_t gyroAddr = 0x6B;
 uint8_t altAddr = 0x77;
 
-uint16_t altCalVals[11]
+uint16_t altCalVals[11];
 
 uint8_t acceleration[6];
 uint8_t gyroscope[6];
 uint8_t magnetic[6];
 
+//read from 0xF6 and 0xF7 to get values
+uint8_t readAddr = 0xF6; // MSB
 
 void initAccel();
 void readAccel(uint8_t* data);
@@ -137,7 +142,7 @@ void initAltimeter(uint16_t* data)
 	//get calibration values (0xAA- 0xBF)
 
 
-	for(i = 0; i < 11; i++)
+	for(int i = 0; i < 11; i++)
 	{
 		data[i] = i2c_smbus_read_byte_data(file, (readAddr+2i));
 		data[i] |=  (i2c_smbus_read_byte_data(file, (readAddr+2i+1)) << 8) ;
@@ -155,11 +160,6 @@ void readTemp(uint8_t* data)
 	//send conversion command to control register 0xF4
 	//temperature 0x2E
 	i2c_smbus_write_word_data(file, 0xF4, 0x2E);
-
-
-
-	//read from 0xF6 and 0xF7 to get values
-	uint8_t readAddr = 0xF6; // MSB
 
 
 	data[0] = i2c_smbus_read_byte_data(file, readAddr);
