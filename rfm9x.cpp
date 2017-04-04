@@ -47,7 +47,7 @@ void Radio::setReg(unsigned char reg, unsigned char value) {
   }};
   int status = ioctl(fd, SPI_IOC_MESSAGE(2), mesg);
 }
-unsigned char Radio::readReg(unsigned char reg) {
+unsigned char Radio::getReg(unsigned char reg) {
   unsigned char value;
   struct spi_ioc_transfer mesg[2] = {
     {
@@ -166,12 +166,12 @@ void Radio::startReceiving() {
   // clear all interrupts
   setReg(0x12, 0xFF);
   // mask all the others
-  setReg(0x11, ~0x60);
+  setReg(0x11, (unsigned char)~0x60);
   // Continous receive mode
   setReg(0x01, 0x85);
 }
 
-void Radio::stopReceiving() {
+void Radio::standby() {
   setReg(0x01, 0x81);
 }
 
@@ -191,7 +191,7 @@ void Radio::transmit(const void *data) {
   // clear all interrupts
   setReg(0x12, 0xFF);
   // mask all the others
-  setReg(0x11, ~0x80);
+  setReg(0x11, (unsigned char)~0x80);
   // Start transmitting
   setReg(0x01, 0x83);
   // Wait for receipt of packet

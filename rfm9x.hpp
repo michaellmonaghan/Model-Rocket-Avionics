@@ -11,7 +11,7 @@ class Radio {
 private:
   int fd;
   bool error;
-  void setReg(unsigned char reg, char value);
+  void setReg(unsigned char reg, unsigned char value);
   unsigned char getReg(unsigned char reg);
   void readFIFO(void *data, unsigned char length);
   void writeFIFO(const void *data, unsigned char length);
@@ -21,6 +21,6 @@ public:
   void transmit(const void *data, int length);
   void startReceiving();
   void receive(void *data);
-  void stopReceiving();
+  void standby();
   void transmit(const void *data);
 };
